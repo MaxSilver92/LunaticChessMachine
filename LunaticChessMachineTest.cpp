@@ -4642,7 +4642,7 @@ bool getMove()
 void selfTrain(int trainCount)
 {
 bool x{0}, result{0};
-int count{0}, moveNumber{0};
+int count{0}, count2{0};
 while (trainCount > 0)
 {
     while (result == 0)
@@ -4654,7 +4654,21 @@ while (trainCount > 0)
             ++count;
         }
         count = 0;
-        //std::cout << 5;
+        while (count < 64)
+        {
+            g_squareTemp[count] = g_masterBoard[count];
+            ++count;
+        }
+        count = 0;
+        count2 = 63;
+        while (count < 64)
+        {
+            g_masterBoard[count] = g_squareTemp[count2];
+            --count2;
+            ++count;
+        }
+        count = 0;
+        count2 = 63;
     }
     if (g_toMove == 0)
     {
