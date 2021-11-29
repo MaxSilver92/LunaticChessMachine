@@ -15,7 +15,6 @@ std::mt19937 mersenne{ static_cast<std::mt19937::result_type>(std::time(nullptr)
 class Timer
 {
 private:
-    // Type aliases to make accessing nested type easier
     using clock_type = std::chrono::steady_clock;
     using second_type = std::chrono::duration<double, std::ratio<1> >;
 
