@@ -6,7 +6,7 @@
 #include <chrono> 
 
 bool g_showMoves, g_toMove{ 0 }, g_castleKing{ 1 }, g_castleQueen{ 1 }, g_opponentCastleKing{ 1 }, g_opponentCastleQueen{ 1 };
-int g_fiftyMoveRule, g_weightMaster[705], g_weightTest[705], g_masterBoard[64]{ -4, -2, -3, -5, -6, -3, -2, -4, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 4, 2, 3, 5, 6, 3, 2, 4 }, g_boardTemp[64], g_prevMove1, g_prevMove2;
+int g_fiftyMoveRule, g_weightMaster[5][705], g_weightTest[100][705], g_masterBoard[64]{ -4, -2, -3, -5, -6, -3, -2, -4, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 4, 2, 3, 5, 6, 3, 2, 4 }, g_boardTemp[64], g_prevMove1, g_prevMove2;
 //starting position {-4, -2, -3, -5, -6, -3, -2, -4, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 4, 2, 3, 5, 6, 3, 2, 4}
 //benchmark postion for getMove speed testing {-4, -2, 0, -5, -6, 0, 0, -4, 0, -1, 0, 0, -3, -1, -1, -1, -1, 0, 0, -1, -3, -2, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 2, 0, 3, 1, 0, 0, 1, 1, 1, 5, 0, 0, 1, 1, 4, 0, 0, 0, 6, 3, 0, 4}
 std::mt19937 mersenne{ static_cast<std::mt19937::result_type>(std::time(nullptr)) };
@@ -48,11 +48,11 @@ float neuron(float weight, float i1, float i2, float i3, float i4, float i5, flo
 {
     float x(i1 + i2 + i3 + i4 + i5 + i6 + i7 + i8 + i9 + i10 + i11 + i12 + i13 + i14 + i15 + i16 + i17 + i18 + i19 + i20 + i21 + i22 + i23 + i24 + i25 + i26 + i27 + i28 + i29 + i30 + i31 + i32 + i33 + i34 + i35 + i36 + i37 + i38 + i39 + i40 + i41 + i42 + i43 + i44 + i45 + i46 + i47 + i48 + i49 + i50 + i51 + i52 + i53 + i54 + i55 + i56 + i57 + i58 + i59 + i60 + i61 + i62 + i63 + i64);
     x = x * weight;
-    x = -2 * (1 / (1 + std::pow(2, x))) + 2;
+    x = -2 * (1 / (1 + std::pow(1.01, x))) + 2;
     return x;
 }
 
-float neuralNet()
+float neuralnet(int testNum, int variationCount)
 {
     float n[64], ntest[64];
     int output1{ 0 }, output2{ 0 }, count{ 0 }, count2{ 0 }, count3{ 0 };
@@ -60,7 +60,7 @@ float neuralNet()
     {
         while (count < 64)
         {
-            n[count] = neuron(g_weightMaster[count2], g_masterBoard[0], g_masterBoard[1], g_masterBoard[2], g_masterBoard[3], g_masterBoard[4], g_masterBoard[5], g_masterBoard[6], g_masterBoard[7], g_masterBoard[8], g_masterBoard[9], g_masterBoard[10], g_masterBoard[11], g_masterBoard[12], g_masterBoard[13], g_masterBoard[14], g_masterBoard[15], g_masterBoard[16], g_masterBoard[17], g_masterBoard[18], g_masterBoard[19], g_masterBoard[20], g_masterBoard[21], g_masterBoard[22], g_masterBoard[23], g_masterBoard[24], g_masterBoard[25], g_masterBoard[26], g_masterBoard[27], g_masterBoard[28], g_masterBoard[29], g_masterBoard[30], g_masterBoard[31], g_masterBoard[32], g_masterBoard[33], g_masterBoard[34], g_masterBoard[35], g_masterBoard[36], g_masterBoard[37], g_masterBoard[38], g_masterBoard[39], g_masterBoard[40], g_masterBoard[41], g_masterBoard[42], g_masterBoard[43], g_masterBoard[44], g_masterBoard[45], g_masterBoard[46], g_masterBoard[47], g_masterBoard[48], g_masterBoard[49], g_masterBoard[50], g_masterBoard[51], g_masterBoard[52], g_masterBoard[53], g_masterBoard[54], g_masterBoard[55], g_masterBoard[56], g_masterBoard[57], g_masterBoard[58], g_masterBoard[59], g_masterBoard[60], g_masterBoard[61], g_masterBoard[62], g_masterBoard[63]);
+            n[count] = neuron(g_weightMaster[testNum][count2], g_masterBoard[0], g_masterBoard[1], g_masterBoard[2], g_masterBoard[3], g_masterBoard[4], g_masterBoard[5], g_masterBoard[6], g_masterBoard[7], g_masterBoard[8], g_masterBoard[9], g_masterBoard[10], g_masterBoard[11], g_masterBoard[12], g_masterBoard[13], g_masterBoard[14], g_masterBoard[15], g_masterBoard[16], g_masterBoard[17], g_masterBoard[18], g_masterBoard[19], g_masterBoard[20], g_masterBoard[21], g_masterBoard[22], g_masterBoard[23], g_masterBoard[24], g_masterBoard[25], g_masterBoard[26], g_masterBoard[27], g_masterBoard[28], g_masterBoard[29], g_masterBoard[30], g_masterBoard[31], g_masterBoard[32], g_masterBoard[33], g_masterBoard[34], g_masterBoard[35], g_masterBoard[36], g_masterBoard[37], g_masterBoard[38], g_masterBoard[39], g_masterBoard[40], g_masterBoard[41], g_masterBoard[42], g_masterBoard[43], g_masterBoard[44], g_masterBoard[45], g_masterBoard[46], g_masterBoard[47], g_masterBoard[48], g_masterBoard[49], g_masterBoard[50], g_masterBoard[51], g_masterBoard[52], g_masterBoard[53], g_masterBoard[54], g_masterBoard[55], g_masterBoard[56], g_masterBoard[57], g_masterBoard[58], g_masterBoard[59], g_masterBoard[60], g_masterBoard[61], g_masterBoard[62], g_masterBoard[63]);
             ++count;
             ++count2;
         }
@@ -69,7 +69,7 @@ float neuralNet()
         {
             while (count < 64)
             {
-                ntest[count] = neuron(g_weightMaster[count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
+                ntest[count] = neuron(g_weightMaster[testNum][count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
                 ++count;
                 ++count2;
             }
@@ -82,14 +82,14 @@ float neuralNet()
             count = 0;
             ++count3;
         }
-        n[0] = neuronFinal(g_weightMaster[count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
+        n[0] = neuronFinal(g_weightMaster[testNum][count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
         return n[0];
     }
     else
     {
         while (count < 64)
         {
-            n[count] = neuron(g_weightMaster[count2], g_masterBoard[0], g_masterBoard[1], g_masterBoard[2], g_masterBoard[3], g_masterBoard[4], g_masterBoard[5], g_masterBoard[6], g_masterBoard[7], g_masterBoard[8], g_masterBoard[9], g_masterBoard[10], g_masterBoard[11], g_masterBoard[12], g_masterBoard[13], g_masterBoard[14], g_masterBoard[15], g_masterBoard[16], g_masterBoard[17], g_masterBoard[18], g_masterBoard[19], g_masterBoard[20], g_masterBoard[21], g_masterBoard[22], g_masterBoard[23], g_masterBoard[24], g_masterBoard[25], g_masterBoard[26], g_masterBoard[27], g_masterBoard[28], g_masterBoard[29], g_masterBoard[30], g_masterBoard[31], g_masterBoard[32], g_masterBoard[33], g_masterBoard[34], g_masterBoard[35], g_masterBoard[36], g_masterBoard[37], g_masterBoard[38], g_masterBoard[39], g_masterBoard[40], g_masterBoard[41], g_masterBoard[42], g_masterBoard[43], g_masterBoard[44], g_masterBoard[45], g_masterBoard[46], g_masterBoard[47], g_masterBoard[48], g_masterBoard[49], g_masterBoard[50], g_masterBoard[51], g_masterBoard[52], g_masterBoard[53], g_masterBoard[54], g_masterBoard[55], g_masterBoard[56], g_masterBoard[57], g_masterBoard[58], g_masterBoard[59], g_masterBoard[60], g_masterBoard[61], g_masterBoard[62], g_masterBoard[63]);
+            n[count] = neuron(g_weightMaster[variationCount][count2], g_masterBoard[0], g_masterBoard[1], g_masterBoard[2], g_masterBoard[3], g_masterBoard[4], g_masterBoard[5], g_masterBoard[6], g_masterBoard[7], g_masterBoard[8], g_masterBoard[9], g_masterBoard[10], g_masterBoard[11], g_masterBoard[12], g_masterBoard[13], g_masterBoard[14], g_masterBoard[15], g_masterBoard[16], g_masterBoard[17], g_masterBoard[18], g_masterBoard[19], g_masterBoard[20], g_masterBoard[21], g_masterBoard[22], g_masterBoard[23], g_masterBoard[24], g_masterBoard[25], g_masterBoard[26], g_masterBoard[27], g_masterBoard[28], g_masterBoard[29], g_masterBoard[30], g_masterBoard[31], g_masterBoard[32], g_masterBoard[33], g_masterBoard[34], g_masterBoard[35], g_masterBoard[36], g_masterBoard[37], g_masterBoard[38], g_masterBoard[39], g_masterBoard[40], g_masterBoard[41], g_masterBoard[42], g_masterBoard[43], g_masterBoard[44], g_masterBoard[45], g_masterBoard[46], g_masterBoard[47], g_masterBoard[48], g_masterBoard[49], g_masterBoard[50], g_masterBoard[51], g_masterBoard[52], g_masterBoard[53], g_masterBoard[54], g_masterBoard[55], g_masterBoard[56], g_masterBoard[57], g_masterBoard[58], g_masterBoard[59], g_masterBoard[60], g_masterBoard[61], g_masterBoard[62], g_masterBoard[63]);
             ++count;
             ++count2;
         }
@@ -98,7 +98,7 @@ float neuralNet()
         {
             while (count < 64)
             {
-                ntest[count] = neuron(g_weightTest[count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
+                ntest[count] = neuron(g_weightTest[variationCount][count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
                 ++count;
                 ++count2;
             }
@@ -111,7 +111,7 @@ float neuralNet()
             count = 0;
             ++count3;
         }
-        n[0] = neuronFinal(g_weightTest[count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
+        n[0] = neuronFinal(g_weightTest[variationCount][count2], n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12], n[13], n[14], n[15], n[16], n[17], n[18], n[19], n[20], n[21], n[22], n[23], n[24], n[25], n[26], n[27], n[28], n[29], n[30], n[31], n[32], n[33], n[34], n[35], n[36], n[37], n[38], n[39], n[40], n[41], n[42], n[43], n[44], n[45], n[46], n[47], n[48], n[49], n[50], n[51], n[52], n[53], n[54], n[55], n[56], n[57], n[58], n[59], n[60], n[61], n[62], n[63]);
         return n[0];
     }
     return 0;
@@ -848,18 +848,18 @@ bool isKingSafe()
     return 1;
 }
 
-int playMove()
+int playMove(int testNum, int variationCount)
 {
     int move1[540], move2[540], moveValue[540], moveCount{ 0 };
     float moveEval[540];
-    for (int count{0}; count < 540; ++count)
+    for (int count{ 0 }; count < 540; ++count)
     {
         move1[count] = 0;
         move2[count] = 0;
         moveValue[count] = 0;
         moveEval[count] = 0;
     }
-    for (int count{0}; count < 64; ++count)
+    for (int count{ 0 }; count < 64; ++count)
     {
         if (g_masterBoard[count] == 1)
         {
@@ -869,7 +869,7 @@ int playMove()
                 g_boardTemp[count - 16] = 1;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 16;
                     moveValue[moveCount] = 1;
@@ -879,7 +879,7 @@ int playMove()
             }
             if (count > 7)
             {
-                
+
                 if (g_boardTemp[count - 8] == 0)
                 {
                     if (count - 8 < 8)
@@ -887,7 +887,7 @@ int playMove()
                         g_boardTemp[count - 8] = 2;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 8;
                             moveValue[moveCount] = 2;
@@ -896,7 +896,7 @@ int playMove()
                         g_boardTemp[count - 8] = 3;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 8;
                             moveValue[moveCount] = 3;
@@ -905,7 +905,7 @@ int playMove()
                         g_boardTemp[count - 8] = 4;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 8;
                             moveValue[moveCount] = 4;
@@ -914,7 +914,7 @@ int playMove()
                         g_boardTemp[count - 8] = 5;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 8;
                             moveValue[moveCount] = 5;
@@ -927,7 +927,7 @@ int playMove()
                         g_boardTemp[count - 8] = 1;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 8;
                             moveValue[moveCount] = 1;
@@ -943,7 +943,7 @@ int playMove()
                         g_boardTemp[count - 7] = 2;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 7;
                             moveValue[moveCount] = 2;
@@ -952,7 +952,7 @@ int playMove()
                         g_boardTemp[count - 7] = 3;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 7;
                             moveValue[moveCount] = 3;
@@ -961,7 +961,7 @@ int playMove()
                         g_boardTemp[count - 7] = 4;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 7;
                             moveValue[moveCount] = 4;
@@ -970,7 +970,7 @@ int playMove()
                         g_boardTemp[count - 7] = 5;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 7;
                             moveValue[moveCount] = 5;
@@ -983,7 +983,7 @@ int playMove()
                         g_boardTemp[count - 7] = 1;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 7;
                             moveValue[moveCount] = 1;
@@ -999,7 +999,7 @@ int playMove()
                         g_boardTemp[count - 9] = 2;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 9;
                             moveValue[moveCount] = 2;
@@ -1008,7 +1008,7 @@ int playMove()
                         g_boardTemp[count - 9] = 3;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 9;
                             moveValue[moveCount] = 3;
@@ -1017,7 +1017,7 @@ int playMove()
                         g_boardTemp[count - 9] = 4;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 9;
                             moveValue[moveCount] = 4;
@@ -1026,7 +1026,7 @@ int playMove()
                         g_boardTemp[count - 9] = 5;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 9;
                             moveValue[moveCount] = 5;
@@ -1039,7 +1039,7 @@ int playMove()
                         g_boardTemp[count - 9] = 1;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 9;
                             moveValue[moveCount] = 1;
@@ -1054,7 +1054,7 @@ int playMove()
                     g_boardTemp[count + 1] = 0;
                     if (isKingSafe() == 1)
                     {
-                        moveEval[moveCount] = neuralNet();
+                        moveEval[moveCount] = neuralnet(testNum, variationCount);
                         move1[moveCount] = count;
                         move2[moveCount] = count - 7;
                         moveValue[moveCount] = 1;
@@ -1069,7 +1069,7 @@ int playMove()
                     g_boardTemp[count - 1] = 0;
                     if (isKingSafe() == 1)
                     {
-                        moveEval[moveCount] = neuralNet();
+                        moveEval[moveCount] = neuralnet(testNum, variationCount);
                         move1[moveCount] = count;
                         move2[moveCount] = count - 9;
                         moveValue[moveCount] = 1;
@@ -1091,7 +1091,7 @@ int playMove()
                     g_boardTemp[count - 8] = 6;
                     if (isKingSafe() == 1)
                     {
-                        moveEval[moveCount] = neuralNet();
+                        moveEval[moveCount] = neuralnet(testNum, variationCount);
                         move1[moveCount] = count;
                         move2[moveCount] = count - 8;
                         moveValue[moveCount] = 6;
@@ -1106,7 +1106,7 @@ int playMove()
                         g_boardTemp[count - 9] = 6;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 9;
                             moveValue[moveCount] = 6;
@@ -1122,7 +1122,7 @@ int playMove()
                         g_boardTemp[count - 7] = 6;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count - 7;
                             moveValue[moveCount] = 6;
@@ -1131,7 +1131,7 @@ int playMove()
                         g_boardTemp[count - 7] = g_masterBoard[count - 7];
                     }
                 }
-                
+
             }
             if (count % 8 != 0)
             {
@@ -1140,7 +1140,7 @@ int playMove()
                     g_boardTemp[count - 1] = 6;
                     if (isKingSafe() == 1)
                     {
-                        moveEval[moveCount] = neuralNet();
+                        moveEval[moveCount] = neuralnet(testNum, variationCount);
                         move1[moveCount] = count;
                         move2[moveCount] = count - 1;
                         moveValue[moveCount] = 6;
@@ -1156,7 +1156,7 @@ int playMove()
                     g_boardTemp[count + 1] = 6;
                     if (isKingSafe() == 1)
                     {
-                        moveEval[moveCount] = neuralNet();
+                        moveEval[moveCount] = neuralnet(testNum, variationCount);
                         move1[moveCount] = count;
                         move2[moveCount] = count + 1;
                         moveValue[moveCount] = 6;
@@ -1172,7 +1172,7 @@ int playMove()
                     g_boardTemp[count + 8] = 6;
                     if (isKingSafe() == 1)
                     {
-                        moveEval[moveCount] = neuralNet();
+                        moveEval[moveCount] = neuralnet(testNum, variationCount);
                         move1[moveCount] = count;
                         move2[moveCount] = count + 8;
                         moveValue[moveCount] = 6;
@@ -1187,7 +1187,7 @@ int playMove()
                         g_boardTemp[count + 7] = 6;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count + 7;
                             moveValue[moveCount] = 6;
@@ -1203,7 +1203,7 @@ int playMove()
                         g_boardTemp[count + 9] = 6;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = count;
                             move2[moveCount] = count + 9;
                             moveValue[moveCount] = 6;
@@ -1218,20 +1218,20 @@ int playMove()
                 if (g_toMove == 0 && g_castleKing == 1)
                 {
                     g_boardTemp[61] = 6;
+                    if (isKingSafe() == 1)
+                    {
+                        g_boardTemp[61] = 0;
+                        g_boardTemp[62] = 6;
                         if (isKingSafe() == 1)
                         {
-                            g_boardTemp[61] = 0;
-                            g_boardTemp[62] = 6;
-                            if (isKingSafe() == 1)
-                            {
-                                moveEval[moveCount] = neuralNet();
-                                move1[moveCount] = 60;
-                                move2[moveCount] = 62;
-                                moveValue[moveCount] = 6;
-                                ++moveCount;
-                            }
-                            g_boardTemp[62] = 0;
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
+                            move1[moveCount] = 60;
+                            move2[moveCount] = 62;
+                            moveValue[moveCount] = 6;
+                            ++moveCount;
                         }
+                        g_boardTemp[62] = 0;
+                    }
                     g_boardTemp[61] = 0;
                 }
                 if (g_toMove == 1 && g_opponentCastleKing == 1)
@@ -1243,7 +1243,7 @@ int playMove()
                         g_boardTemp[62] = 6;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = 60;
                             move2[moveCount] = 62;
                             moveValue[moveCount] = 6;
@@ -1265,7 +1265,7 @@ int playMove()
                         g_boardTemp[58] = 6;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = 60;
                             move2[moveCount] = 58;
                             moveValue[moveCount] = 6;
@@ -1284,7 +1284,7 @@ int playMove()
                         g_boardTemp[58] = 6;
                         if (isKingSafe() == 1)
                         {
-                            moveEval[moveCount] = neuralNet();
+                            moveEval[moveCount] = neuralnet(testNum, variationCount);
                             move1[moveCount] = 60;
                             move2[moveCount] = 58;
                             moveValue[moveCount] = 6;
@@ -1300,12 +1300,12 @@ int playMove()
         if (g_masterBoard[count] == 2)
         {
             g_boardTemp[count] = 0;
-            if (count % 8 < 7 && count > 15 && g_masterBoard[count-15]<1)
+            if (count % 8 < 7 && count > 15 && g_masterBoard[count - 15] < 1)
             {
                 g_boardTemp[count - 15] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 15;
                     moveValue[moveCount] = 2;
@@ -1318,7 +1318,7 @@ int playMove()
                 g_boardTemp[count - 17] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 17;
                     moveValue[moveCount] = 2;
@@ -1331,7 +1331,7 @@ int playMove()
                 g_boardTemp[count - 10] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 10;
                     moveValue[moveCount] = 2;
@@ -1344,7 +1344,7 @@ int playMove()
                 g_boardTemp[count + 6] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 6;
                     moveValue[moveCount] = 2;
@@ -1357,7 +1357,7 @@ int playMove()
                 g_boardTemp[count + 15] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 15;
                     moveValue[moveCount] = 2;
@@ -1370,7 +1370,7 @@ int playMove()
                 g_boardTemp[count + 17] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 17;
                     moveValue[moveCount] = 2;
@@ -1383,7 +1383,7 @@ int playMove()
                 g_boardTemp[count + 10] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 10;
                     moveValue[moveCount] = 2;
@@ -1396,7 +1396,7 @@ int playMove()
                 g_boardTemp[count - 6] = 2;
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 6;
                     moveValue[moveCount] = 2;
@@ -1416,7 +1416,7 @@ int playMove()
                 g_boardTemp[count - 9] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 9;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1429,7 +1429,7 @@ int playMove()
                 g_boardTemp[count - 18] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 18;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1442,7 +1442,7 @@ int playMove()
                 g_boardTemp[count - 27] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 27;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1455,7 +1455,7 @@ int playMove()
                 g_boardTemp[count - 36] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 36;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1468,7 +1468,7 @@ int playMove()
                 g_boardTemp[count - 45] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 45;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1481,7 +1481,7 @@ int playMove()
                 g_boardTemp[count - 54] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 54;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1494,7 +1494,7 @@ int playMove()
                 g_boardTemp[0] = g_masterBoard[63];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = 63;
                     move2[moveCount] = 0;
                     moveValue[moveCount] = g_masterBoard[63];
@@ -1510,7 +1510,7 @@ int playMove()
                 g_boardTemp[count + 9] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 9;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1523,7 +1523,7 @@ int playMove()
                 g_boardTemp[count + 18] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 18;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1536,7 +1536,7 @@ int playMove()
                 g_boardTemp[count + 27] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 27;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1549,7 +1549,7 @@ int playMove()
                 g_boardTemp[count + 36] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 36;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1562,7 +1562,7 @@ int playMove()
                 g_boardTemp[count + 45] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 45;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1575,7 +1575,7 @@ int playMove()
                 g_boardTemp[count + 54] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 54;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1588,7 +1588,7 @@ int playMove()
                 g_boardTemp[63] = g_masterBoard[0];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = 0;
                     move2[moveCount] = 63;
                     moveValue[moveCount] = g_masterBoard[0];
@@ -1605,7 +1605,7 @@ int playMove()
                 g_boardTemp[count - 7] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 7;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1618,7 +1618,7 @@ int playMove()
                 g_boardTemp[count - 14] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 14;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1631,7 +1631,7 @@ int playMove()
                 g_boardTemp[count - 21] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 21;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1644,7 +1644,7 @@ int playMove()
                 g_boardTemp[count - 28] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 28;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1657,7 +1657,7 @@ int playMove()
                 g_boardTemp[count - 35] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 35;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1670,7 +1670,7 @@ int playMove()
                 g_boardTemp[count - 42] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 42;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1683,7 +1683,7 @@ int playMove()
                 g_boardTemp[7] = g_masterBoard[56];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = 56;
                     move2[moveCount] = 7;
                     moveValue[moveCount] = g_masterBoard[56];
@@ -1701,7 +1701,7 @@ int playMove()
                 g_boardTemp[count + 7] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 7;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1714,7 +1714,7 @@ int playMove()
                 g_boardTemp[count + 14] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 18;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1727,7 +1727,7 @@ int playMove()
                 g_boardTemp[count + 21] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 21;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1740,7 +1740,7 @@ int playMove()
                 g_boardTemp[count + 28] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 28;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1753,7 +1753,7 @@ int playMove()
                 g_boardTemp[count + 35] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 35;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1766,7 +1766,7 @@ int playMove()
                 g_boardTemp[count + 42] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 42;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1779,7 +1779,7 @@ int playMove()
                 g_boardTemp[56] = g_masterBoard[7];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = 7;
                     move2[moveCount] = 56;
                     moveValue[moveCount] = g_masterBoard[7];
@@ -1797,7 +1797,7 @@ int playMove()
                 g_boardTemp[count - 8] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 8;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1810,7 +1810,7 @@ int playMove()
                 g_boardTemp[count - 16] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 16;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1823,7 +1823,7 @@ int playMove()
                 g_boardTemp[count - 24] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 24;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1836,7 +1836,7 @@ int playMove()
                 g_boardTemp[count - 32] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 32;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1849,7 +1849,7 @@ int playMove()
                 g_boardTemp[count - 40] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 40;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1862,7 +1862,7 @@ int playMove()
                 g_boardTemp[count - 48] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 48;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1875,7 +1875,7 @@ int playMove()
                 g_boardTemp[count - 56] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 56;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1893,7 +1893,7 @@ int playMove()
                 g_boardTemp[count + 8] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 8;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1906,7 +1906,7 @@ int playMove()
                 g_boardTemp[count + 16] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 16;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1919,7 +1919,7 @@ int playMove()
                 g_boardTemp[count + 24] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 24;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1932,7 +1932,7 @@ int playMove()
                 g_boardTemp[count + 32] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 32;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1945,7 +1945,7 @@ int playMove()
                 g_boardTemp[count + 40] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 40;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1958,7 +1958,7 @@ int playMove()
                 g_boardTemp[count + 48] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 48;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1971,7 +1971,7 @@ int playMove()
                 g_boardTemp[count + 56] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 56;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -1989,7 +1989,7 @@ int playMove()
                 g_boardTemp[count + 1] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 1;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2002,7 +2002,7 @@ int playMove()
                 g_boardTemp[count + 2] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 2;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2015,7 +2015,7 @@ int playMove()
                 g_boardTemp[count + 3] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 3;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2028,7 +2028,7 @@ int playMove()
                 g_boardTemp[count + 4] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 4;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2041,7 +2041,7 @@ int playMove()
                 g_boardTemp[count + 5] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 5;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2054,7 +2054,7 @@ int playMove()
                 g_boardTemp[count + 6] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 6;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2067,7 +2067,7 @@ int playMove()
                 g_boardTemp[count + 7] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count + 7;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2085,7 +2085,7 @@ int playMove()
                 g_boardTemp[count - 1] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 1;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2098,7 +2098,7 @@ int playMove()
                 g_boardTemp[count - 2] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 2;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2111,7 +2111,7 @@ int playMove()
                 g_boardTemp[count - 3] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 3;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2124,7 +2124,7 @@ int playMove()
                 g_boardTemp[count - 4] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 4;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2137,7 +2137,7 @@ int playMove()
                 g_boardTemp[count - 5] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 5;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2150,7 +2150,7 @@ int playMove()
                 g_boardTemp[count - 6] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 6;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2163,7 +2163,7 @@ int playMove()
                 g_boardTemp[count - 7] = g_masterBoard[count];
                 if (isKingSafe() == 1)
                 {
-                    moveEval[moveCount] = neuralNet();
+                    moveEval[moveCount] = neuralnet(testNum, variationCount);
                     move1[moveCount] = count;
                     move2[moveCount] = count - 7;
                     moveValue[moveCount] = g_masterBoard[count];
@@ -2174,7 +2174,11 @@ int playMove()
             g_boardTemp[count] = g_masterBoard[count];
         }
     }
-    //std::cout << moveCount << '\n';
+    for (int count{}; count < moveCount; ++count)
+    {
+        //std::cout << moveEval[count] << '\n';
+    }
+        
     if (moveCount == 0)
     {
         if (g_toMove == 0)
@@ -2191,10 +2195,10 @@ int playMove()
     {
         if (moveEval[moveCount] > bestMoveEval)
         {
-            bestMoveEval = moveEval[moveCount-1];
-            bestMove1 = move1[moveCount-1];
-            bestMove2 = move2[moveCount-1];
-            bestMoveValue = moveValue[moveCount-1];
+            bestMoveEval = moveEval[moveCount - 1];
+            bestMove1 = move1[moveCount - 1];
+            bestMove2 = move2[moveCount - 1];
+            bestMoveValue = moveValue[moveCount - 1];
         }
         --moveCount;
     }
@@ -2290,88 +2294,168 @@ int playMove()
     return 0;
 }
 
-void mutate(int variations)
+void generateNewWeights()
 {
-    for (int count{}; count < 705; ++count)
+    std::uniform_int_distribution<> die{ 1, 704 };
+    std::uniform_int_distribution<> die2{ 1, 4};
+    std::uniform_int_distribution<> die3{ -1000, 1000 };
+    for (int count{}; count < 100; ++count)
     {
-        g_weightTest[count] = g_weightMaster[count];
+        int count2{};
+        for (; count2 < die(mersenne); ++count2)
+        {
+            g_weightTest[count][count2] = g_weightMaster[die2(mersenne)][count2];
+        }
+        for (; count2 < 705; ++count2)
+        {
+            g_weightTest[count][count2] = g_weightMaster[0][count2];
+        }
     }
-    std::uniform_int_distribution<> die{ -1000, 1000 };
-    std::uniform_int_distribution<> die2{ 0, 705 };
-    for (; variations > 0; --variations)
+    for (int count{}; count < 100; ++count)
     {
-        g_weightTest[die2(mersenne)] = die(mersenne) / 100;
+        g_weightTest[count][die(mersenne)] = die3(mersenne) / 100;
     }
 }
 
 void train()
 {
     std::cout << "how many generations do you want to train the neural net?\n";
-    int trainCount, result{}, moveCount{};
-    std::cin >> trainCount;
+    int generations, result{}, moveCount{};
+    std::cin >> generations;
     Timer t;
-    while (trainCount > 0)
+    while (generations > 0)
     {
-        for (int count{}; count < 100; ++count)
+        generateNewWeights();
+        int fitness[100]{}, bestFitness1{2}, bestFitness2{ 2 }, bestFitness3{ 2 }, bestFitness4{ 2 }, bestFitness5{ 2 }, bestFitnessCount{0};
+        for (int variationCount{}; variationCount < 1; ++variationCount)
         {
-            mutate(count);
-            
-            while (result == 0)
+            for (int count{}; count < 5; ++count)
             {
-                result = playMove();
-                ++moveCount;
-                if (g_showMoves == 1)
+                while (result == 0)
                 {
+                    result = playMove(count, variationCount);
+                    ++moveCount;
+                    if (g_showMoves == 1 && variationCount==99)
+                    {
+                        for (int count2{}; count2 < 64; ++count2)
+                        {
+                            std::cout << g_masterBoard[count2] << '\t';
+                            ++count2;
+                            std::cout << g_masterBoard[count2] << '\t';
+                            ++count2;
+                            std::cout << g_masterBoard[count2] << '\t';
+                            ++count2;
+                            std::cout << g_masterBoard[count2] << '\t';
+                            ++count2;
+                            std::cout << g_masterBoard[count2] << '\t';
+                            ++count2;
+                            std::cout << g_masterBoard[count2] << '\t';
+                            ++count2;
+                            std::cout << g_masterBoard[count2] << '\t';
+                            ++count2;
+                            std::cout << g_masterBoard[count2] << '\n';
+                        }
+                        std::cout << '\n';
+                    }
                     for (int count2{}; count2 < 64; ++count2)
                     {
-                        std::cout << g_masterBoard[count2] << '\t';
-                        ++count2;
-                        std::cout << g_masterBoard[count2] << '\t';
-                        ++count2;
-                        std::cout << g_masterBoard[count2] << '\t';
-                        ++count2;
-                        std::cout << g_masterBoard[count2] << '\t';
-                        ++count2;
-                        std::cout << g_masterBoard[count2] << '\t';
-                        ++count2;
-                        std::cout << g_masterBoard[count2] << '\t';
-                        ++count2;
-                        std::cout << g_masterBoard[count2] << '\t';
-                        ++count2;
-                        std::cout << g_masterBoard[count2] << '\n';
+                        g_masterBoard[count2] = g_masterBoard[count2] * -1;
+                        g_boardTemp[count2] = g_masterBoard[count2];
                     }
-                    std::cout << '\n';
+                    int count3{ 63 };
+                    for (int count2{}; count2 < 64; ++count2)
+                    {
+                        g_masterBoard[count2] = g_boardTemp[count3];
+                        --count3;
+                    }
+                    count3 = 63;
+                    for (int count2{}; count2 < 64; ++count2)
+                    {
+                        g_boardTemp[count2] = g_masterBoard[count2];
+                    }
                 }
-                for (int count2{}; count2 < 64; ++count2)
+                if (result == 2)
                 {
-                    g_masterBoard[count2] = g_masterBoard[count2] * -1;
-                    g_boardTemp[count2] = g_masterBoard[count2];
+                    ++fitness[variationCount];
                 }
-                int count3{ 63 };
-                for (int count2{}; count2 < 64; ++count2)
+                result = 0;
+                g_fiftyMoveRule = 0;
+                g_masterBoard[0] = -4;
+                g_masterBoard[1] = -2;
+                g_masterBoard[2] = -3;
+                g_masterBoard[3] = -5;
+                g_masterBoard[4] = -6;
+                g_masterBoard[5] = -3;
+                g_masterBoard[6] = -2;
+                g_masterBoard[7] = -4;
+                g_masterBoard[8] = -1;
+                g_masterBoard[9] = -1;
+                g_masterBoard[10] = -1;
+                g_masterBoard[11] = -1;
+                g_masterBoard[12] = -1;
+                g_masterBoard[13] = -1;
+                g_masterBoard[14] = -1;
+                g_masterBoard[15] = -1;
+                for (int count2{ 16 }; count2 < 48; ++count2)
                 {
-                    g_masterBoard[count2] = g_boardTemp[count3];
-                    --count3;
+                    g_masterBoard[count2] = 0;
                 }
-                count3 = 63;
-                for (int count2{}; count2 < 64; ++count2)
-                {
-                    g_boardTemp[count2] = g_masterBoard[count2];
-                }
-                //fix turns
+                g_masterBoard[49] = 1;
+                g_masterBoard[50] = 1;
+                g_masterBoard[51] = 1;
+                g_masterBoard[52] = 1;
+                g_masterBoard[53] = 1;
+                g_masterBoard[54] = 1;
+                g_masterBoard[55] = 1;
+                g_masterBoard[56] = 4;
+                g_masterBoard[57] = 2;
+                g_masterBoard[58] = 3;
+                g_masterBoard[59] = 5;
+                g_masterBoard[60] = 6;
+                g_masterBoard[61] = 3;
+                g_masterBoard[62] = 2;
+                g_masterBoard[63] = 4;
             }
-            if (result == 2)
+        }
+        --generations;
+        for (int count{}; count < 100; ++count)
+        {
+            if (fitness[count] > bestFitness1)
             {
                 for (int count2{}; count2 < 705; ++count2)
                 {
-                    g_weightMaster[count2] = g_weightTest[count2];
+                    g_weightMaster[0][count2] = g_weightTest[count][count2];
                 }
-                std::cout << "better net found\n";
             }
-            result = 0;
-            g_fiftyMoveRule = 0;
+            else if (fitness[count] > bestFitness2)
+            {
+                for (int count2{}; count2 < 705; ++count2)
+                {
+                    g_weightMaster[0][count2] = g_weightTest[count][count2];
+                }
+            }
+            else if (fitness[count] > bestFitness3)
+            {
+                for (int count2{}; count2 < 705; ++count2)
+                {
+                    g_weightMaster[0][count2] = g_weightTest[count][count2];
+                }
+            }
+            else if (fitness[count] > bestFitness4)
+            {
+                for (int count2{}; count2 < 705; ++count2)
+                {
+                    g_weightMaster[0][count2] = g_weightTest[count][count2];
+                }
+            }
+            else if (fitness[count] > bestFitness5)
+            {
+                for (int count2{}; count2 < 705; ++count2)
+                {
+                    g_weightMaster[0][count2] = g_weightTest[count][count2];
+                }
+            }
         }
-        --trainCount;
         std::cout << moveCount << '\n';
     }
     std::cout << "training finished\n";
@@ -2380,9 +2464,32 @@ void train()
 
 int main()
 {
-    //need to implement weights file read and write
+    std::fstream neuralNetWeights;
+    neuralNetWeights.open("neuralNetWeights705.txt");
+    if (!neuralNetWeights)
+    {
+        std::cerr << "no weights file";
+        return 1;
+    }
+    for (int count{}; count < 705; ++count)
+    {
+        for (int count2{}; count2 < 5; ++count2)
+        {
+            neuralNetWeights >> g_weightMaster[count2][count];
+        }
+    }
+    for (int count{}; count < 40; ++count)
+    {
+        std::cout << g_weightMaster[0][count];
+    }
     std::cout << "do you want to show moves? 1 for yes, 0 for no\n";
     std::cin >> g_showMoves;
     train();
+    neuralNetWeights.seekg(0, std::ios::beg);
+    for (int count{}; count < 705; ++count)
+    {
+        neuralNetWeights << g_weightMaster[0][count];
+    }
+    neuralNetWeights.close();
     return 0;
 }
